@@ -6,7 +6,19 @@ import pyspark.sql.functions as psf
 
 
 # TODO Create a schema for incoming resources
-schema = StructType([
+schema = StructType([StructField("crime_id", StringType(), True),
+                     StructField("original_crime_type_name", StringType(), True),
+                     StructField("report_date", TimestampType(), True),
+                     StructField("call_date", TimestampType(), True),
+                     StructField("offense_date", TimestampType(), True),
+                     StructField("call_time", StringType(), True),
+                     StructField("disposition", StringType(), True),
+                     StructField("address", StringType(), True),
+                     StructField("city", StringType(), True),
+                     StructField("state", StringType(), True),
+                     StructField("agency_id", StringType(), True),
+                     StructField("address_type", StringType(), True),
+                     StructField("common_location", StringType(), True),
 ])
 
 def run_spark_job(spark):
@@ -29,10 +41,10 @@ def run_spark_job(spark):
         .select("DF.*")
 
     # TODO select original_crime_type_name and disposition
-    distinct_table = 
+    distinct_table =
 
     # count the number of original crime type
-    agg_df = 
+    agg_df =
 
     # TODO Q1. Submit a screen shot of a batch ingestion of the aggregation
     # TODO write output stream
