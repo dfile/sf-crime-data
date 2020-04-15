@@ -28,6 +28,12 @@ def run_spark_job(spark):
     # set up correct bootstrap server and port
     df = spark \
         .readStream \
+        .schema(schema) \
+        .format("kafka") \
+        .option("kafka.bootstrap.servers", "localhost:9092") \
+        .option("subscribe", "gov.san-francisco.crime") \
+        .option("maxOffsetsPerTrigger", 200)
+        .load()
 
     # Show schema for the incoming resources for checks
     df.printSchema()
