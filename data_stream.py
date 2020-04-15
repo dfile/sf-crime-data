@@ -32,7 +32,7 @@ def run_spark_job(spark):
         .format("kafka") \
         .option("kafka.bootstrap.servers", "localhost:9092") \
         .option("subscribe", "gov.san-francisco.crime") \
-        .option("maxOffsetsPerTrigger", 200)
+        .option("maxOffsetsPerTrigger", 200) \
         .load()
 
     # Show schema for the incoming resources for checks
