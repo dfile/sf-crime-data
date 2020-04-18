@@ -12,7 +12,7 @@ schema = StructType([StructField("crime_id", StringType(), True),
                      StructField("call_date", TimestampType(), True),
                      StructField("offense_date", TimestampType(), True),
                      StructField("call_time", StringType(), True),
-                     StructField("call_date_time", StringType(), True),
+                     StructField("call_date_time", TimestampType(), True),
                      StructField("disposition", StringType(), True),
                      StructField("address", StringType(), True),
                      StructField("city", StringType(), True),
@@ -54,15 +54,24 @@ def run_spark_job(spark):
     distinct_table = service_table.select("original_crime_type_name", "disposition", "call_date_time").distinct()
 
     # count the number of original crime type
-    agg_df = distinct_table.distinct().count()
+    agg_df = distinct_table.withWatermark("call_date_time", "1 hour") \
+        .groupBy(
+        psf.window(distinct_table.call_date_time, "10 minutes", "5 minutes"),
+        psf.col("original_crime_type_name")) \
+        .count()
 
     # TODO Q1. Submit a screen shot of a batch ingestion of the aggregation
     # TODO write output stream
-    #query = agg_df \
+    query = agg_df.writeStream \
+        .format("console") \
+        .outputMode("Complete") \
+        .trigger(processingTime='1 seconds') \
+        .start()
+
 
 
     # TODO attach a ProgressReporter
-    #query.awaitTermination()
+    query.awaitTermination()
 
     # TODO get the right radio code json path
     #radio_code_json_filepath = ""
@@ -90,6 +99,8 @@ if __name__ == "__main__":
         .master("local[*]") \
         .appName("KafkaSparkStructuredStreaming") \
         .getOrCreate()
+
+    spark.sparkContext.setLogLevel("WARN")
 
     logger.info("Spark started")
 
